@@ -8,10 +8,14 @@ import {
   liberarTravaMotor1 
 } from "@/lib/motor-lock";
 
-// Limite de execução serverless da Vercel (Hobby = até 10-15s, Pro = 60s)
-// Processamos um lote seguro por disparo
-const LOTE_CRON = 10;
-const DELAY_SEFAZ_MS = 1500;
+// Configura tempo limite máximo permitido na Vercel (60 segundos)
+export const maxDuration = 60;
+
+// Processa 20 notas em lote seguro com ritmo humano aleatório
+const LOTE_CRON = 20;
+
+// Jitter aleatório humano (1.5s a 2.8s) para comportamento indetectável no WAF/F5 da SEFAZ
+const obterDelayAleatorioMs = () => Math.floor(Math.random() * (2800 - 1500 + 1)) + 1500;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -160,8 +164,8 @@ export async function GET(req: NextRequest) {
         registrarPulsoNotaMotor1(false);
       }
 
-      // Delay de proteção anti-bloqueio
-      await sleep(DELAY_SEFAZ_MS);
+      // Delay de proteção anti-bloqueio com ritmo humano aleatório
+      await sleep(obterDelayAleatorioMs());
     }
 
     liberarTravaMotor1("CONCLUIDO");
