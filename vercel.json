@@ -2,6 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/enriquecer",
+      "schedule": "0 12 * * *"
     }
   ]
 }
